@@ -93,7 +93,18 @@ export const getStaticPaths: GetStaticPaths = async () => {
   // const posts = await prismic.query(TODO);
 
   return {
-    paths: ['/post/como-utilizar-hooks'],
+    paths: [
+      {
+        params: {
+          slug: 'como-utilizar-hooks',
+        },
+      },
+      {
+        params: {
+          slug: 'criando-um-app-cra-do-zero',
+        },
+      },
+    ],
     fallback: true,
   };
 };

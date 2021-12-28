@@ -1,1 +1,49 @@
 // TODO
+
+.content {
+    margin-top: 2rem;
+
+    a {
+        display: block;
+        margin-bottom: 2rem;
+    }
+
+    strong {
+        font-size: 1.5rem;
+        color: var(--white);
+        font-weight: bold;
+        line-height: 2.5rem;
+        display: block;
+    }
+
+    p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    time, span {
+        display: inline;
+        line-height: 1.25rem;
+        font-size: 0.9rem;
+        
+
+        svg {
+            width: 18px;
+            height: 18px;
+            vertical-align: text-bottom;
+        }
+    }
+
+    time + span {
+        margin-left: 1rem; 
+    }
+
+}
+
+.loadMore {
+        background-color: transparent;
+        color: var(--pink-500);
+        border: 0;
+        font-weight: 600;
+        height: 2rem;
+}

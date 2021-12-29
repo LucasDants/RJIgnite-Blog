@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -5,6 +6,7 @@ import { RichText } from 'prismic-dom';
 import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
+import Link from 'next/link';
 import { useEffect } from 'react';
 import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
@@ -29,9 +31,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, preview }: PostProps) {
   const router = useRouter();
 
   useEffect(() => {
@@ -67,13 +70,16 @@ export default function Post({ post }: PostProps) {
       <Head>
         <title> Slug | SpaceTraveling </title>
       </Head>
-      <img
-        src="https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F2fbacb7a-e460-44a3-8fc5-e66f96dae148%2Fcover-reactjs.png?table=block&id=b1a3645d-286b-4eec-93f5-f1f5476d0ff7&spaceId=08f749ff-d06d-49a8-a488-9846e081b224&width=2000&userId=51726d10-a3bc-4c2f-82a6-dd023e21e7d7&cache=v2"
-        alt=""
-        className={styles.banner}
-      />
+      <img src={post.data.banner.url} alt="" className={styles.banner} />
       <main className={commonStyles.container}>
         <div className={styles.container}>
+          {preview && (
+            <aside>
+              <Link href="/api/exit-preview">
+                <a>Sair do modo Preview</a>
+              </Link>
+            </aside>
+          )}
           <strong>{post.data.title}</strong>
           <time>
             <FiCalendar />{' '}
@@ -128,10 +134,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
   const { slug } = params;
-  const response = await prismic.getByUID('posts', String(slug), {});
+  const response = await prismic.getByUID('posts', String(slug), {
+    ref: previewData?.ref ?? null,
+  });
 
   return {
     props: {
@@ -151,6 +163,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           })),
         },
       },
+      preview,
     },
     revalidate: 60 * 60 * 24,
   };

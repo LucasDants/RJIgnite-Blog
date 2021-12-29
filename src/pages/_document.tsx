@@ -12,6 +12,11 @@ export default class MyDocument extends Document {
             rel="stylesheet"
           />
           <link rel="shortcut icon" href="/favicon.png" type="image/png" />
+          <script
+            async
+            defer
+            src="https://static.cdn.prismic.io/prismic.js?new=true&repo=spacetraveling-rocketseat-ignite"
+          />
         </Head>
         <body>
           <Main />

@@ -19,6 +19,18 @@
         margin-bottom: 2rem;
     }
 
+    aside {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 3rem;
+        a {
+            color: var(--pink-500);
+            font-size: 1rem;
+            font-weight: bold;
+
+        }
+    }
+
     time, span {
         display: inline;
         line-height: 1.25rem;

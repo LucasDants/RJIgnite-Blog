@@ -43,7 +43,7 @@ export default function Post({ post }: PostProps) {
 
   const postWords = post.data.content
     .reduce((acc, content) => {
-      return acc + content.body;
+      return acc + RichText.asText(content.body) + content.heading;
     }, '')
     .split(' ').length;
 
@@ -63,7 +63,10 @@ export default function Post({ post }: PostProps) {
         <div className={styles.container}>
           <strong>{post.data.title}</strong>
           <time>
-            <FiCalendar /> {post.first_publication_date}
+            <FiCalendar />{' '}
+            {format(new Date(post.first_publication_date), 'dd MMM yyyy', {
+              locale: ptBR,
+            })}
           </time>
           <span>
             <FiUser /> {post.data.author}
@@ -74,13 +77,15 @@ export default function Post({ post }: PostProps) {
         </div>
         <article className={styles.content}>
           {post.data.content.map(content => (
-            <>
+            <div key={content.heading}>
               <h1>{content.heading}</h1>
               <div
                 className={styles.postContent}
-                dangerouslySetInnerHTML={{ __html: content.body }}
+                dangerouslySetInnerHTML={{
+                  __html: RichText.asHtml(content.body),
+                }}
               />
-            </>
+            </div>
           ))}
         </article>
       </main>
@@ -114,37 +119,24 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { slug } = params;
   const response = await prismic.getByUID('posts', String(slug), {});
 
-  const readingTime =
-    response.data.content
-      .reduce((acc, content) => {
-        RichText.asText(content.body);
-        return acc + RichText.asText(content.body);
-      }, '')
-      .split(' ').length / 200;
-
   return {
     props: {
       post: {
-        first_publication_date: format(
-          new Date(response.first_publication_date),
-          'dd MMM yyyy',
-          {
-            locale: ptBR,
-          }
-        ),
+        first_publication_date: response.first_publication_date,
+        uid: response.uid,
         data: {
           title: response.data.title,
+          subtitle: response.data.subtitle,
           banner: {
             url: response.data.banner.url,
           },
-          author: response.data.title,
+          author: response.data.author,
           content: response.data.content.map(content => ({
             heading: content.heading,
-            body: RichText.asHtml(content.body),
+            body: content.body,
           })),
         },
       },
-      readingTime: Math.ceil(readingTime),
     },
     revalidate: 60 * 60 * 24,
   };

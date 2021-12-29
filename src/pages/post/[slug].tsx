@@ -5,6 +5,7 @@ import { RichText } from 'prismic-dom';
 import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
+import { useEffect } from 'react';
 import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
@@ -32,6 +33,18 @@ interface PostProps {
 
 export default function Post({ post }: PostProps) {
   const router = useRouter();
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    const anchor = document.getElementById('inject-comments-for-uterances');
+    script.setAttribute('src', 'https://utteranc.es/client.js');
+    script.setAttribute('crossorigin', 'anonymous');
+    script.setAttribute('async', 'true');
+    script.setAttribute('repo', 'LucasDants/RJIgnite-utterances');
+    script.setAttribute('issue-term', 'pathname');
+    script.setAttribute('theme', 'dark-blue');
+    anchor.appendChild(script);
+  }, []);
 
   if (router.isFallback) {
     return (
@@ -88,6 +101,7 @@ export default function Post({ post }: PostProps) {
             </div>
           ))}
         </article>
+        <div id="inject-comments-for-uterances" />
       </main>
     </>
   );

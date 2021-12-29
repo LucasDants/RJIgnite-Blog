@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { RichText } from 'prismic-dom';
 import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 import { format } from 'date-fns';
+import Prismic from '@prismicio/client';
 import ptBR from 'date-fns/locale/pt-BR';
 import Link from 'next/link';
 import { useEffect } from 'react';
@@ -29,25 +30,34 @@ interface Post {
   };
 }
 
+interface LinkPost {
+  slug: string;
+  title: string;
+}
+
 interface PostProps {
   post: Post;
   preview: boolean;
+  prevPost: LinkPost | null;
+  nextPost: LinkPost | null;
 }
 
-export default function Post({ post, preview }: PostProps) {
+export default function Post({ post, preview, nextPost, prevPost }: PostProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const script = document.createElement('script');
-    const anchor = document.getElementById('inject-comments-for-uterances');
-    script.setAttribute('src', 'https://utteranc.es/client.js');
-    script.setAttribute('crossorigin', 'anonymous');
-    script.setAttribute('async', 'true');
-    script.setAttribute('repo', 'LucasDants/RJIgnite-utterances');
-    script.setAttribute('issue-term', 'pathname');
-    script.setAttribute('theme', 'dark-blue');
-    anchor.appendChild(script);
-  }, []);
+    if (!router.isFallback) {
+      const script = document.createElement('script');
+      const anchor = document.getElementById('inject-comments-for-uterances');
+      script.setAttribute('src', 'https://utteranc.es/client.js');
+      script.setAttribute('crossorigin', 'anonymous');
+      script.setAttribute('async', 'true');
+      script.setAttribute('repo', 'LucasDants/RJIgnite-utterances');
+      script.setAttribute('issue-term', 'pathname');
+      script.setAttribute('theme', 'dark-blue');
+      anchor.appendChild(script);
+    }
+  }, [router.isFallback]);
 
   if (router.isFallback) {
     return (
@@ -107,6 +117,29 @@ export default function Post({ post, preview }: PostProps) {
             </div>
           ))}
         </article>
+        <div className={styles.divider} />
+        <footer className={styles.footer}>
+          <div className={styles.prevPost}>
+            {prevPost && (
+              <>
+                <p>{prevPost.title}</p>
+                <Link href={`/post/${prevPost.slug}`}>
+                  <a>Post anterior</a>
+                </Link>
+              </>
+            )}
+          </div>
+          <div className={styles.nextPost}>
+            {nextPost && (
+              <>
+                <p>{nextPost.title}</p>
+                <Link href={`/post/${nextPost.slug}`}>
+                  <a>Próximo Post</a>
+                </Link>
+              </>
+            )}
+          </div>
+        </footer>
         <div id="inject-comments-for-uterances" />
       </main>
     </>
@@ -145,8 +178,27 @@ export const getStaticProps: GetStaticProps = async ({
     ref: previewData?.ref ?? null,
   });
 
+  const posts = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    {
+      fetch: ['posts.title'],
+      ref: previewData?.ref ?? null,
+    }
+  );
+
+  const indexPost = posts.results.findIndex(post => post.uid === response.uid);
+
+  const prevPost = posts.results[indexPost - 1];
+  const nextPost = posts.results[indexPost + 1];
+
   return {
     props: {
+      prevPost: prevPost
+        ? {
+            slug: prevPost.uid,
+            title: prevPost?.data.title,
+          }
+        : null,
       post: {
         first_publication_date: response.first_publication_date,
         uid: response.uid,
@@ -163,6 +215,12 @@ export const getStaticProps: GetStaticProps = async ({
           })),
         },
       },
+      nextPost: nextPost
+        ? {
+            slug: nextPost.uid,
+            title: nextPost?.data.title,
+          }
+        : null,
       preview,
     },
     revalidate: 60 * 60 * 24,

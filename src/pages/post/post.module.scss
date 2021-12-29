@@ -51,8 +51,6 @@
 }
 
 .content {
-    padding-bottom: 4rem;
-
     h1 {
         font-size: 2rem;
         margin-bottom: 2rem;
@@ -76,4 +74,41 @@
             margin: 0.5rem 0;
         }
     }
+}
+
+.divider {
+    height: 1px;
+    background-color: var(--gray-200);
+    border-radius: 1px;
+    filter: brightness(0.2);
+    margin: 1rem auto;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+
+    div {
+        p {
+            font-weight: bold;
+        }
+
+        a {
+            color: var(--pink-500);
+            font-size: 1rem;
+            line-height: 1.2rem;
+        }
+
+        &.prevPost {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &.nextPost {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+    }
+
 }

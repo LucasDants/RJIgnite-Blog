@@ -15,6 +15,7 @@ import styles from './post.module.scss';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -103,6 +104,15 @@ export default function Post({ post, preview, nextPost, prevPost }: PostProps) {
           <span>
             <FiClock /> {readingTime} min
           </span>
+          <p>
+            {format(
+              new Date(post.last_publication_date),
+              "'*editado em 'dd MMM yyyy, 'às' HH:mm",
+              {
+                locale: ptBR,
+              }
+            )}
+          </p>
         </div>
         <article className={styles.content}>
           {post.data.content.map(content => (
@@ -201,6 +211,7 @@ export const getStaticProps: GetStaticProps = async ({
         : null,
       post: {
         first_publication_date: response.first_publication_date,
+        last_publication_date: response.last_publication_date,
         uid: response.uid,
         data: {
           title: response.data.title,

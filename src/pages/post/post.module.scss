@@ -10,6 +10,13 @@
     margin-top: 3rem;
     margin-bottom: 3rem;
 
+    p {
+        line-height: 1.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--gray-200);
+    }
+
     strong {
         font-size: 3rem;
         color: var(--white);
@@ -35,7 +42,7 @@
         display: inline;
         line-height: 1.25rem;
         font-size: 1rem;
-        
+        color: var(--gray-200);
 
         svg {
             width: 18px;
